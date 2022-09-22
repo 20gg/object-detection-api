@@ -11,18 +11,20 @@ models:
 api:
 	cd models/research && \
 	protoc object_detection/protos/*.proto --python_out=. && \
+	#use tf1.15
 	cp object_detection/packages/tf1/setup.py . && \
 	python -m pip install --use-feature=2020-resolver .
 test:
 	cd models/research && \
 	python object_detection/builders/model_builder_tf1_test.py
 install:  models  api test
+# make workspace-box-t1 SAVE_DIR=workspace NAME=test
 workspace-box-t1:
 	python scripts/workspace/box/workspace.py --save_dir=$(SAVE_DIR) --name=$(NAME)
 	cp -r scripts/workspace/box/files/* $(SAVE_DIR)/$(NAME)
 	cp models/research/object_detection/model_main.py $(SAVE_DIR)/$(NAME)
-	cp models/research/object_detection/exporter_main.py $(SAVE_DIR)/$(NAME)
-	cp models/research/object_detection/export_tflite_graph.py $(SAVE_DIR)/$(NAME)
+	cp models/research/object_detection/export_inference_graph.py $(SAVE_DIR)/$(NAME)
+	cp models/research/object_detection/export_tflite_ssd_graph.py $(SAVE_DIR)/$(NAME)
 	touch $(SAVE_DIR)/$(NAME)/annotations/label_map.pbtxt
 workspace-box:
 	python scripts/workspace/box/workspace.py --save_dir=$(SAVE_DIR) --name=$(NAME)

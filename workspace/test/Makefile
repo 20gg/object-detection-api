@@ -1,3 +1,5 @@
+
+#First lable jpg change to TFRecord 
 gen-tfrecord:
 	python gen_label_map.py
 	
@@ -10,7 +12,7 @@ gen-tfrecord:
 	-x images/val \
 	-l annotations/label_map.pbtxt \
 	-o annotations/val.record
-
+#Second download preTraining model
 dl-model-t1:
 	mkdir -p pre-trained-models; \
 	model=ssd_mobilenet_v2_coco_2018_03_29; \
@@ -18,6 +20,7 @@ dl-model-t1:
 	tar zxvf $$model.tar.gz; \
 	mv -f $$model ./pre-trained-models/; \
 	rm -rf $$model $$model.tar.gz;
+#ssd_mobilenet_v2_coco.config is from models\research\object_detection\samples\configs\ssd_mobilenet_v2_coco.config
 train-t1:
 	python model_main.py \
 	--model_dir=models/ssd_mobilenet_v2_coco_2018_03_29/train \
@@ -45,6 +48,7 @@ convert-lite-t1:
 	--input_shapes=1,300,300,3 \
 	--input_arrays=normalized_input_image_tensor \
 	--output_arrays=raw_outputs/box_encodings,raw_outputs/class_predictions
+#The follow is for tf2.0+
 dl-model:
 	mkdir -p pre-trained-models; \
 	model=ssd_mobilenet_v2_fpnlite_320x320_coco17_tpu-8; \
