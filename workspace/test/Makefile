@@ -10,6 +10,41 @@ gen-tfrecord:
 	-x images/val \
 	-l annotations/label_map.pbtxt \
 	-o annotations/val.record
+
+dl-model-t1:
+	mkdir -p pre-trained-models; \
+	model=ssd_mobilenet_v2_coco_2018_03_29; \
+	curl -O http://download.tensorflow.org/models/object_detection/$$model.tar.gz; \
+	tar zxvf $$model.tar.gz; \
+	mv -f $$model ./pre-trained-models/; \
+	rm -rf $$model $$model.tar.gz;
+train-t1:
+	python model_main.py \
+	--model_dir=models/ssd_mobilenet_v2_coco_2018_03_29/train \
+	--pipeline_config_path=models/ssd_mobilenet_v2_coco_2018_03_29/ssd_mobilenet_v2_coco.config \
+	--num_train_steps=10000
+export-t1:
+	python export_inference_graph.py \
+	--input_type=image_tensor \
+	--pipeline_config_path=models/ssd_mobilenet_v2_coco_2018_03_29/ssd_mobilenet_v2_coco.config \
+	--trained_checkpoint_prefix=models/ssd_mobilenet_v2_coco_2018_03_29/train/model.ckpt-8351 \
+	--output_directory exported-models/ssd_mobilenet_v2_coco_2018_03_29
+export-lite-t1:
+	python export_tflite_ssd_graph.py \
+	--pipeline_config_path=exported-models/ssd_mobilenet_v2_coco_2018_03_29/pipeline.config \
+	--trained_checkpoint_prefix=exported-models/ssd_mobilenet_v2_coco_2018_03_29/model.ckpt \
+	--output_directory=exported-models/ssd_mobilenet_v2_coco_2018_03_29 \
+	--add_postprocessing_op=False
+convert-lite-t1:
+	tflite_convert  \
+	--graph_def_file=exported-models/ssd_mobilenet_v2_coco_2018_03_29/tflite_graph.pb \
+	--output_file=exported-models/ssd_mobilenet_v2_coco_2018_03_29/model.tflite \
+	--input_format=TENSORFLOW_GRAPHDEF \
+	--output_format=TFLITE \
+	--inference_type=FLOAT \
+	--input_shapes=1,300,300,3 \
+	--input_arrays=normalized_input_image_tensor \
+	--output_arrays=raw_outputs/box_encodings,raw_outputs/class_predictions
 dl-model:
 	mkdir -p pre-trained-models; \
 	model=ssd_mobilenet_v2_fpnlite_320x320_coco17_tpu-8; \
