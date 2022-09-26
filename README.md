@@ -253,7 +253,7 @@ tflite_convert --  \
   --output_arrays=raw_outputs/box_encodings,raw_outputs/class_predictions
 ```
 
-恭喜,最终您将获得您第一个TFLite 模型 `mode.tflite`,可以应用在mediapipe了.
+恭喜,最终您，成功捕获TFLite模型一个 `mode.tflite`,可以应用在mediapipe了.
 
 ## Usage
 
