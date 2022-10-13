@@ -11,7 +11,6 @@ models:
 api:
 	cd models/research && \
 	protoc object_detection/protos/*.proto --python_out=. && \
-	#use tf1.15
 	cp object_detection/packages/tf1/setup.py . && \
 	python -m pip install --use-feature=2020-resolver .
 test:
